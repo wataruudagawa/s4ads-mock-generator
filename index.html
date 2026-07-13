@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>S4Ads 掲載イメージモック ジェネレーター</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Segoe UI", sans-serif; background:#f3f4f6; color:#222; }
+  .layout { display:flex; min-height:100vh; }
+  .panel { width:400px; flex-shrink:0; background:#fff; border-right:1px solid #e2e2e2; padding:20px; overflow-y:auto; height:100vh; position:sticky; top:0; }
+  .preview { flex:1; padding:20px; overflow:auto; height:100vh; }
+  h1 { font-size:16px; margin:0 0 4px; }
+  .lead { font-size:12px; color:#666; margin:0 0 20px; line-height:1.6; }
+  .step { border-top:1px solid #eee; padding-top:14px; margin-top:14px; }
+  .step-num { display:inline-block; width:18px; height:18px; border-radius:50%; background:#1c2b50; color:#fff; font-size:11px; text-align:center; line-height:18px; margin-right:6px; }
+  .step-title { font-size:13px; font-weight:bold; }
+  label { display:block; font-size:11px; color:#555; margin:8px 0 3px; }
+  input[type=text], input[type=url], textarea, select { width:100%; font-size:12px; padding:6px 8px; border:1px solid #ccc; border-radius:4px; font-family:inherit; }
+  textarea { resize:vertical; }
+  .bookmarklet {
+    display:inline-block; background:#1c2b50; color:#fff !important; text-decoration:none;
+    padding:10px 16px; border-radius:6px; font-size:13px; font-weight:bold; cursor:grab; margin:8px 0;
+  }
+  .hint { font-size:11px; color:#888; line-height:1.6; margin:4px 0 0; }
+  .btn { display:block; width:100%; background:#2952e3; color:#fff; border:none; padding:11px; border-radius:6px; font-size:14px; font-weight:bold; cursor:pointer; margin-top:6px; }
+  .btn:disabled { background:#aab; cursor:default; }
+  .btn.secondary { background:#eee; color:#333; }
+  .status { font-size:11px; color:#2952e3; min-height:14px; margin-top:6px; }
+  table { width:100%; border-collapse:collapse; font-size:11px; margin-top:8px; }
+  th, td { border-bottom:1px solid #eee; padding:4px 3px; text-align:left; vertical-align:top; }
+  td input { font-size:11px; padding:3px 4px; }
+  .thumb { width:36px; height:26px; object-fit:cover; border-radius:3px; background:#ddd; }
+  .role-tag { font-size:9px; padding:1px 5px; border-radius:3px; font-weight:bold; white-space:nowrap; }
+  .role-ad { background:#fde2e2; color:#c0272d; }
+  .role-rec { background:#fff2d9; color:#a2680a; }
+  .role-organic { background:#eee; color:#666; }
+  .row-btns button { border:none; background:none; cursor:pointer; font-size:12px; padding:1px 3px; }
+  .color-row { display:flex; gap:8px; }
+  .color-row > div { flex:1; }
+  input[type=color] { width:100%; height:28px; padding:2px; }
+  iframe { width:100%; height:calc(100vh - 40px); border:1px solid #ddd; border-radius:8px; background:#fff; }
+  .preview-title { font-size:12px; color:#666; margin:0 0 8px; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <div class="panel">
+    <h1>S4Ads 掲載イメージモック ジェネレーター</h1>
+    <p class="lead">対象サイトの検索結果ページからヘッダー・商品情報を抽出して、S4Ads広告掲載イメージのインタラクティブモックを自動生成します。</p>
+
+    <div class="step">
+      <div class="step-title"><span class="step-num">1</span>クライアント名</div>
+      <label>ダウンロードファイル名に使用</label>
+      <input type="text" id="clientName" placeholder="例：〇〇株式会社">
+    </div>
+
+    <div class="step">
+      <div class="step-title"><span class="step-num">2</span>データ抽出ブックマークレット</div>
+      <p class="hint">下のボタンをブックマークバーへドラッグしてください。</p>
+      <a class="bookmarklet" id="bookmarkletLink" href="#" onclick="return false;">📥 S4Ads抽出</a>
+      <p class="hint">①対象の検索結果ページ（例：ふるなびの「お肉」検索結果）を開く → ②ブックマークバーの「📥 S4Ads抽出」をクリック → ③自動でこのページに新しいタブが開き、データが反映されます。</p>
+    </div>
+
+    <div class="step">
+      <div class="step-title"><span class="step-num">3</span>自動反映されない場合</div>
+      <label>抽出JSONを貼り付け</label>
+      <textarea id="pasteJson" rows="3" placeholder='{"siteName":"...","products":[...]}'></textarea>
+      <button class="btn secondary" onclick="applyPastedJson()">反映</button>
+    </div>
+
+    <div class="step">
+      <div class="step-title"><span class="step-num">4</span>ヘッダー設定</div>
+      <label>サイト名</label>
+      <input type="text" id="siteName">
+      <label>ロゴ画像URL</label>
+      <input type="text" id="logoImage">
+      <div class="color-row">
+        <div>
+          <label>検索ボタン色</label>
+          <input type="color" id="headerSearchBtnColor" value="#1c2b50">
+        </div>
+        <div>
+          <label>PR/CTA色</label>
+          <input type="color" id="siteAccent" value="#e2231a">
+        </div>
+      </div>
+      <label>ナビ項目（カンマ区切り）</label>
+      <input type="text" id="navItems">
+      <label>クイック検索キーワード（カンマ区切り）</label>
+      <input type="text" id="quickKeywords">
+    </div>
+
+    <div class="step">
+      <div class="step-title"><span class="step-num">5</span>商品一覧（先頭4件＝検索PR枠 / 次の2件＝レコメンド枠 / 残り＝通常表示）</div>
+      <table id="productTable">
+        <thead><tr><th></th><th>役割</th><th>商品</th><th></th></tr></thead>
+        <tbody id="productTbody"></tbody>
+      </table>
+      <button class="btn secondary" onclick="addBlankProduct()">＋ 商品を追加</button>
+    </div>
+
+    <div class="step">
+      <button class="btn" id="downloadBtn" onclick="downloadMock()">HTMLをダウンロード</button>
+      <button class="btn secondary" onclick="updatePreview()">プレビュー更新</button>
+      <div class="status" id="status"></div>
+    </div>
+  </div>
+
+  <div class="preview">
+    <p class="preview-title">プレビュー（実際にクリック・スクロールして操作できます）</p>
+    <iframe id="previewFrame"></iframe>
+  </div>
+</div>
+
+<script>
+var state = {
+  products: []
+};
+var TEMPLATE_HTML = null;
+
+function rgbToHex(rgb) {
+  var m = rgb.match(/\d+/g);
+  if (!m) return null;
+  return "#" + m.slice(0, 3).map(function (n) {
+    return ("0" + parseInt(n, 10).toString(16)).slice(-2);
+  }).join("");
+}
+
+/* ---------- 抽出ロジック（対象ページのコンテキストで実行される） ---------- */
+function extractFromPage(TARGET_URL) {
+  function rgbToHex(rgb) {
+    var m = rgb.match(/\d+/g);
+    if (!m) return null;
+    return "#" + m.slice(0, 3).map(function (n) {
+      return ("0" + parseInt(n, 10).toString(16)).slice(-2);
+    }).join("");
+  }
+  function findLogo() {
+    var imgs = Array.prototype.slice.call(document.images);
+    var candidates = imgs.filter(function (img) {
+      var r = img.getBoundingClientRect();
+      return r.top < 160 && r.top >= -5 && r.width >= 30 && r.width <= 320 && r.height >= 12 && r.height <= 100 && r.left < window.innerWidth * 0.7;
+    });
+    candidates.sort(function (a, b) {
+      var as = /logo/i.test(a.src + a.alt + a.className) ? 0 : 1;
+      var bs = /logo/i.test(b.src + b.alt + b.className) ? 0 : 1;
+      return as - bs;
+    });
+    return candidates.length ? candidates[0].src : null;
+  }
+  function findSearchBtnColor() {
+    var inputs = Array.prototype.slice.call(document.querySelectorAll('input[type="text"],input[type="search"],input:not([type])'));
+    var visible = inputs.filter(function (i) {
+      var r = i.getBoundingClientRect();
+      return r.top >= 0 && r.top < 300 && r.width > 60;
+    });
+    for (var idx = 0; idx < visible.length; idx++) {
+      var inp = visible[idx];
+      var sib = inp.nextElementSibling;
+      for (var i = 0; i < 3 && sib; i++) {
+        var bg = getComputedStyle(sib).backgroundColor;
+        if (bg && bg !== "rgba(0, 0, 0, 0)" && bg !== "rgb(255, 255, 255)") return rgbToHex(bg);
+        sib = sib.nextElementSibling;
+      }
+      var scope = inp.closest("form") || inp.parentElement;
+      var btn = scope ? scope.querySelector('button, input[type="submit"]') : null;
+      if (btn) {
+        var bbg = getComputedStyle(btn).backgroundColor;
+        if (bbg && bbg !== "rgba(0, 0, 0, 0)") return rgbToHex(bbg);
+      }
+    }
+    return "#1c2b50";
+  }
+  function findNavItems() {
+    var all = Array.prototype.slice.call(document.querySelectorAll("a,button"));
+    var items = all.filter(function (el) {
+      var r = el.getBoundingClientRect();
+      var t = el.textContent.trim();
+      return r.top >= 30 && r.top < 170 && r.width > 0 && t.length >= 2 && t.length <= 14;
+    }).map(function (el) { return el.textContent.trim(); });
+    var uniq = [];
+    items.forEach(function (t) { if (uniq.indexOf(t) === -1) uniq.push(t); });
+    return uniq.slice(0, 6);
+  }
+  function findProducts() {
+    var imgs = Array.prototype.slice.call(document.images).filter(function (img) {
+      return img.naturalWidth >= 80 && img.naturalWidth <= 900 && img.naturalHeight >= 80;
+    });
+    var buckets = {};
+    imgs.forEach(function (img) {
+      var key = Math.round(img.naturalWidth / 10) * 10 + "x" + Math.round(img.naturalHeight / 10) * 10;
+      (buckets[key] = buckets[key] || []).push(img);
+    });
+    var best = [];
+    Object.keys(buckets).forEach(function (k) {
+      if (buckets[k].length > best.length && buckets[k].length >= 3) best = buckets[k];
+    });
+    if (best.length === 0) best = imgs.slice(0, 16);
+    var seen = {};
+    var products = [];
+    best.forEach(function (img) {
+      if (seen[img.src]) return;
+      seen[img.src] = true;
+      var scope = img.closest("li") || img.closest("a");
+      if (!scope) {
+        scope = img;
+        for (var i = 0; i < 3 && scope.parentElement; i++) scope = scope.parentElement;
+      }
+      var text = scope.innerText || "";
+      var priceMatch =
+        text.match(/([0-9]{1,3}(?:,[0-9]{3})+|[0-9]{4,})\s*円/) ||
+        text.match(/¥\s*([0-9]{1,3}(?:,[0-9]{3})+|[0-9]{4,})/) ||
+        text.match(/\b([0-9]{1,3}(?:,[0-9]{3})+)\b/);
+      var price = priceMatch ? parseInt(priceMatch[1].replace(/,/g, ""), 10) : null;
+      var reviewMatch = text.match(/\(([0-9]+)\)/);
+      var reviews = reviewMatch ? parseInt(reviewMatch[1], 10) : null;
+      var name = (img.alt || "").trim();
+      if (!name) {
+        var lines = text.split("\n").map(function (s) { return s.trim(); }).filter(Boolean);
+        name = lines.filter(function (l) { return l.length > 4 && l.length < 60 && !/^[0-9,¥円()\s]+$/.test(l); })[0] || "";
+      }
+      products.push({ name: name.slice(0, 80), price: price, place: null, rating: 4.5, reviews: reviews, image: img.src });
+    });
+    return products.slice(0, 20);
+  }
+
+  try {
+    var qs = new URLSearchParams(location.search);
+    var data = {
+      siteName: (document.querySelector('meta[property="og:site_name"]') || {}).content || document.title.split(/[|｜\-–—]/)[0].trim(),
+      siteUrl: location.hostname,
+      logoImage: findLogo(),
+      headerSearchBtnColor: findSearchBtnColor(),
+      navItems: findNavItems(),
+      quickKeywords: [qs.get("keyword") || qs.get("q") || qs.get("query") || ""].filter(Boolean),
+      products: findProducts()
+    };
+    var json = JSON.stringify(data);
+    try { navigator.clipboard.writeText(json); } catch (e) {}
+    var b64 = btoa(unescape(encodeURIComponent(json)));
+    window.open(TARGET_URL.split("#")[0] + "#d=" + b64, "_blank");
+    alert("S4Adsモック用データを取得しました（商品 " + data.products.length + "件）。開いたタブに反映されます。反映されない場合はコピー済みのJSONをジェネレーターに貼り付けてください。");
+  } catch (err) {
+    alert("抽出中にエラーが発生しました: " + err.message);
+  }
+}
+
+function buildBookmarklet() {
+  var targetUrl = location.href.split("#")[0];
+  var src = "javascript:(" + extractFromPage.toString() + ")(" + JSON.stringify(targetUrl) + ")";
+  document.getElementById("bookmarkletLink").setAttribute("href", src);
+}
+
+/* ---------- ページ側：フォーム状態 <-> UI ---------- */
+function applyData(data) {
+  if (data.siteName) document.getElementById("siteName").value = data.siteName;
+  if (data.siteUrl) state.siteUrl = data.siteUrl;
+  if (data.logoImage) document.getElementById("logoImage").value = data.logoImage;
+  if (data.headerSearchBtnColor) document.getElementById("headerSearchBtnColor").value = data.headerSearchBtnColor;
+  if (data.navItems && data.navItems.length) document.getElementById("navItems").value = data.navItems.join(", ");
+  if (data.quickKeywords && data.quickKeywords.length) document.getElementById("quickKeywords").value = data.quickKeywords.join(", ");
+  if (data.products && data.products.length) {
+    state.products = data.products.map(function (p, i) {
+      return { id: "p" + i, name: p.name || "", price: p.price || 0, place: p.place || "", rating: p.rating || 4.5, reviews: p.reviews || 0, image: p.image || "", badge: p.badge || "" };
+    });
+  }
+  renderProductTable();
+  setStatus("データを反映しました（商品 " + state.products.length + "件）。内容を確認してからダウンロードしてください。");
+  updatePreview();
+}
+
+function applyPastedJson() {
+  var raw = document.getElementById("pasteJson").value.trim();
+  if (!raw) return;
+  try {
+    var data = JSON.parse(raw);
+    applyData(data);
+  } catch (e) {
+    setStatus("JSONの読み込みに失敗しました: " + e.message);
+  }
+}
+
+function setStatus(msg) {
+  document.getElementById("status").textContent = msg;
+}
+
+function renderProductTable() {
+  var tbody = document.getElementById("productTbody");
+  tbody.innerHTML = "";
+  state.products.forEach(function (p, idx) {
+    var role = idx < 4 ? "ad" : idx < 6 ? "rec" : "organic";
+    var roleLabel = role === "ad" ? "検索PR" : role === "rec" ? "レコメンド" : "通常";
+    var roleClass = role === "ad" ? "role-ad" : role === "rec" ? "role-rec" : "role-organic";
+    var tr = document.createElement("tr");
+    tr.innerHTML =
+      '<td><img class="thumb" src="' + (p.image || "") + '" onerror="this.style.visibility=\'hidden\'"></td>' +
+      '<td><span class="role-tag ' + roleClass + '">' + roleLabel + "</span></td>" +
+      '<td>' +
+      '<input type="text" value="' + escapeAttr(p.name) + '" data-f="name" style="width:100%;margin-bottom:2px;">' +
+      '<input type="text" value="' + escapeAttr(p.price || "") + '" placeholder="価格" data-f="price" style="width:60%;display:inline-block;margin-right:2px;">' +
+      '<input type="text" value="' + escapeAttr(p.place || "") + '" placeholder="自治体/地域" data-f="place" style="width:37%;display:inline-block;">' +
+      '<input type="text" value="' + escapeAttr(p.image || "") + '" placeholder="画像URL" data-f="image" style="width:100%;margin-top:2px;">' +
+      '<input type="text" value="' + escapeAttr(p.badge || "") + '" placeholder="バッジ(数量限定 等)" data-f="badge" style="width:100%;margin-top:2px;">' +
+      "</td>" +
+      '<td class="row-btns">' +
+      '<button title="上へ" data-act="up">↑</button>' +
+      '<button title="下へ" data-act="down">↓</button><br>' +
+      '<button title="削除" data-act="del">✕</button>' +
+      "</td>";
+    tr.querySelectorAll("input").forEach(function (inp) {
+      inp.addEventListener("change", function () {
+        var f = inp.getAttribute("data-f");
+        p[f] = f === "price" ? parseInt(inp.value.replace(/[^0-9]/g, ""), 10) || 0 : inp.value;
+        if (f === "image") renderProductTable();
+      });
+    });
+    tr.querySelectorAll("button").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var act = btn.getAttribute("data-act");
+        if (act === "del") state.products.splice(idx, 1);
+        if (act === "up" && idx > 0) { state.products.splice(idx - 1, 0, state.products.splice(idx, 1)[0]); }
+        if (act === "down" && idx < state.products.length - 1) { state.products.splice(idx + 1, 0, state.products.splice(idx, 1)[0]); }
+        renderProductTable();
+      });
+    });
+    tbody.appendChild(tr);
+  });
+}
+
+function escapeAttr(v) {
+  return String(v == null ? "" : v).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+}
+
+function addBlankProduct() {
+  state.products.push({ id: "p" + Date.now(), name: "新しい商品", price: 10000, place: "", rating: 4.5, reviews: 0, image: "", badge: "" });
+  renderProductTable();
+}
+
+/* ---------- CONFIG組み立て ---------- */
+function buildConfig() {
+  var navItems = document.getElementById("navItems").value.split(",").map(function (s) { return s.trim(); }).filter(Boolean);
+  var quickKeywords = document.getElementById("quickKeywords").value.split(",").map(function (s) { return s.trim(); }).filter(Boolean);
+  var ads = state.products.slice(0, 4);
+  var recs = state.products.slice(4, 6);
+  var organic = state.products.slice(6).length ? state.products.slice(6) : state.products;
+  function clean(list) {
+    return list.map(function (p) {
+      return { id: p.id, name: p.name, place: p.place, price: p.price, rating: p.rating, reviews: p.reviews, image: p.image, badge: p.badge };
+    });
+  }
+  return {
+    siteName: document.getElementById("siteName").value || "サンプルサイト",
+    siteUrl: state.siteUrl || "example.com",
+    logoImage: document.getElementById("logoImage").value || null,
+    siteAccent: document.getElementById("siteAccent").value,
+    ctaColor: document.getElementById("siteAccent").value,
+    prColor: document.getElementById("siteAccent").value,
+    headerSearchBtnColor: document.getElementById("headerSearchBtnColor").value,
+    bgColor: "#f2f3f5",
+    headerBg: "#ffffff",
+    demoLabelText: "※デモ画面",
+    searchPlaceholder: "キーワードで検索",
+    navItems: navItems.length ? navItems : ["ランキング", "カテゴリ", "特集"],
+    headerLinks: ["よくあるご質問", "ログイン", "お気に入り", "カート"],
+    quickKeywords: quickKeywords.length ? quickKeywords : ["キーワード"],
+    rankingTitle: "人気商品ランキング",
+    searchAdProducts: clean(ads.length ? ads : state.products.slice(0, 4)),
+    recommendAdProducts: clean(recs.length ? recs : state.products.slice(0, 2)),
+    organicProducts: clean(organic)
+  };
+}
+
+function renderMockHtml(config) {
+  var marker = /\/\*__CONFIG_JSON__\*\/[\s\S]*?;\/\*__CONFIG_JSON_END__\*\//;
+  // </script> や <!-- がJSON文字列内に混入していても、埋め込み先の<script>タグが
+  // 途中で閉じてしまわないようにエスケープする（スクレイピングした商品名は信頼できないデータのため）
+  var safeJson = JSON.stringify(config).replace(/</g, "\\u003c").replace(/>/g, "\\u003e");
+  var replacement = "/*__CONFIG_JSON__*/" + safeJson + ";/*__CONFIG_JSON_END__*/";
+  return TEMPLATE_HTML.replace(marker, replacement);
+}
+
+function updatePreview() {
+  if (!TEMPLATE_HTML) { setStatus("テンプレート読み込み中です。少し待って再度お試しください。"); return; }
+  var config = buildConfig();
+  var html = renderMockHtml(config);
+  document.getElementById("previewFrame").srcdoc = html;
+}
+
+function downloadMock() {
+  if (!TEMPLATE_HTML) { setStatus("テンプレート読み込み中です。"); return; }
+  var config = buildConfig();
+  var html = renderMockHtml(config);
+  var blob = new Blob([html], { type: "text/html" });
+  var url = URL.createObjectURL(blob);
+  var name = (document.getElementById("clientName").value || "s4ads_mock").replace(/[^\w぀-ヿ一-龯-]/g, "_");
+  var a = document.createElement("a");
+  a.href = url;
+  a.download = name + "_S4Ads_mock.html";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setStatus("ダウンロードしました: " + a.download);
+}
+
+/* ---------- 初期化 ---------- */
+window.addEventListener("DOMContentLoaded", function () {
+  buildBookmarklet();
+  fetch("./template.html").then(function (r) { return r.text(); }).then(function (t) {
+    TEMPLATE_HTML = t;
+    updatePreview();
+    if (document.getElementById("status").textContent.indexOf("テンプレート読み込み中") !== -1) setStatus("");
+  }).catch(function (e) {
+    setStatus("template.htmlの読み込みに失敗しました（同じフォルダに置いてありますか？）: " + e.message);
+  });
+
+  if (location.hash.indexOf("d=") === 0 || location.hash.indexOf("#d=") === 0) {
+    try {
+      var b64 = location.hash.replace(/^#?d=/, "");
+      var json = decodeURIComponent(escape(atob(b64)));
+      var data = JSON.parse(json);
+      applyData(data);
+    } catch (e) {
+      setStatus("URLからのデータ読み込みに失敗しました: " + e.message);
+    }
+  }
+});
+</script>
+</body>
+</html>

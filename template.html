@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>S4Ads 掲載イメージモック（デモ）</title>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+</head>
+<body style="margin:0;padding:0;background:#e9ebee;">
+<div id="root"></div>
+
+<script>
+/* ============================================================
+   設定値（ここを差し替えれば別サイト・別カラーに対応できます）
+============================================================ */
+window.MOCKUP_CONFIG = /*__CONFIG_JSON__*/{
+  siteName: "ふるなび",
+  siteUrl: "furunavi.jp",
+  logoImage: "https://cf.furunavi.jp/images/header_logo.svg?202311091200",
+  siteAccent: "#e2231a",
+  ctaColor: "#e2231a",
+  prColor: "#e2231a",
+  headerSearchBtnColor: "#1c2b50",
+  bgColor: "#f2f3f5",
+  headerBg: "#ffffff",
+  demoLabelText: "※デモ画面",
+  searchPlaceholder: "返礼品のキーワードから探す",
+  navItems: ["ランキングでさがす", "地域でさがす", "カテゴリでさがす", "特集でさがす", "ふるさと納税を知る", "オリジナルサービス"],
+  headerLinks: ["よくあるご質問", "ログイン", "お気に入り", "カート"],
+  quickKeywords: ["お肉"],
+  rankingTitle: "人気商品ランキング",
+  searchAdProducts: [
+    { id: "698252", name: "佐賀牛 A5ランク サイコロステーキ800g", place: "佐賀県大町町", price: 21000, rating: 4.8, reviews: 15, badge: "A5ランク", image: "https://cf.furunavi.jp/Api/ProductImages/v1?ProductId=698252&Type=1" },
+    { id: "464732", name: "数量限定 厳選 宮崎牛 赤身 焼肉 計800g", place: "宮崎県日南市", price: 14500, rating: 4.6, reviews: 2108, badge: "数量限定", image: "https://cf.furunavi.jp/Api/ProductImages/v1?ProductId=464732&Type=1" },
+    { id: "288216", name: "牛ハラミ 1.3kg｜秘伝の赤タレ 訳あり 焼肉 BBQ", place: "大阪府泉佐野市", price: 15000, rating: 4.5, reviews: 2462, badge: "1位獲得", image: "https://cf.furunavi.jp/Api/ProductImages/v1?ProductId=288216&Type=1" },
+    { id: "456252", name: "飛騨牛 訳あり 焼肉1kg 切りおとし", place: "岐阜県高山市", price: 23000, rating: 4.5, reviews: 574, badge: "ふるなび限定", image: "https://cf.furunavi.jp/Api/ProductImages/v1?ProductId=456252&Type=1" }
+  ],
+  recommendAdProducts: [
+    { id: "60016", name: "伊万里牛 A5等級 かた薄切り700g すき焼き 焼肉 しゃぶしゃぶ", place: "佐賀県伊万里市", price: 18000, rating: 4.6, reviews: 977, badge: "A5等級", image: "https://cf.furunavi.jp/Api/ProductImages/v1?ProductId=60016&Type=1" },
+    { id: "84602", name: "仙台名物 厚切り牛タン400g(200g×2 塩味)", place: "宮城県多賀城市", price: 11000, rating: 4.5, reviews: 968, badge: "焼肉 BBQ", image: "https://cf.furunavi.jp/Api/ProductImages/v1?ProductId=84602&Type=1" }
+  ],
+  organicProducts: [
+    { id: "698186", name: "佐賀牛モモスライス 600g (300g×2パック)", place: "佐賀県大町町", price: 15000, rating: 4.9, reviews: 1, image: "https://cf.furunavi.jp/Api/ProductImages/v1?ProductId=698186&Type=1" },
+    { id: "1577706", name: "訳あり 佐賀牛しゃぶしゃぶすき焼き750gセット", place: "佐賀県大町町", price: 12000, rating: 4.5, reviews: 4, image: "https://cf.furunavi.jp/Api/ProductImages/v1?ProductId=1577706&Type=1" },
+    { id: "73594", name: "佐賀県産黒毛和牛 牛肉切り落とし1kg", place: "佐賀県白石町", price: 20000, rating: 4.5, reviews: 2039, image: "https://cf.furunavi.jp/Api/ProductImages/v1?ProductId=73594&Type=1" },
+    { id: "420195", name: "宮崎県産若鶏もも切身IQF3㎏（250g×12袋）", place: "宮崎県川南町", price: 16000, rating: 4.4, reviews: 936, image: "https://cf.furunavi.jp/Api/ProductImages/v1?ProductId=420195&Type=1" },
+    { id: "312941", name: "【数量限定】国産若鶏5.1kg", place: "宮崎県都城市", price: 14500, rating: 4.3, reviews: 500, image: "https://cf.furunavi.jp/Api/ProductImages/v1?ProductId=312941&Type=1" },
+    { id: "404703", name: "常陸牛 切り落とし900g（450g×2）", place: "茨城県つくばみらい市", price: 12000, rating: 4.3, reviews: 7, image: "https://cf.furunavi.jp/Api/ProductImages/v1?ProductId=404703&Type=1" },
+    { id: "684009", name: "国産牛 赤身切り落とし1.8kg(450g×4パック)", place: "宮崎県都城市", price: 14000, rating: 4.4, reviews: 1497, image: "https://cf.furunavi.jp/Api/ProductImages/v1?ProductId=684009&Type=1" },
+    { id: "770125", name: "訳あり ホタテ 400g（帆立 貝柱 冷凍）", place: "北海道別海町", price: 8000, rating: 4.9, reviews: 2873, image: "https://cf.furunavi.jp/Api/ProductImages/v1?ProductId=770125&Type=1" },
+    { id: "343531", name: "国産 牛肉切り落とし 1.2kg 氷温熟成×極味付け", place: "大阪府泉佐野市", price: 13000, rating: 4.4, reviews: 958, image: "https://cf.furunavi.jp/Api/ProductImages/v1?ProductId=343531&Type=1" },
+    { id: "811853", name: "訳あり 銀鮭切身 約2kg", place: "宮城県気仙沼市", price: 12500, rating: 4.5, reviews: 2496, image: "https://cf.furunavi.jp/Api/ProductImages/v1?ProductId=811853&Type=1" },
+    { id: "36889", name: "おおいた和牛１ポンド極厚ステーキ", place: "大分県国東市", price: 16000, rating: 4.5, reviews: 791, image: "https://cf.furunavi.jp/Api/ProductImages/v1?ProductId=36889&Type=1" },
+    { id: "114035", name: "鉄板焼ハンバーグ デミソース 20個", place: "福岡県飯塚市", price: 16000, rating: 4.6, reviews: 5538, image: "https://cf.furunavi.jp/Api/ProductImages/v1?ProductId=114035&Type=1" }
+  ]
+};/*__CONFIG_JSON_END__*/
+</script>
+
+<script>
+(function () {
+  "use strict";
+  var h = React.createElement;
+  var CONFIG = window.MOCKUP_CONFIG;
+  var useState = React.useState;
+  var useEffect = React.useEffect;
+  var useRef = React.useRef;
+
+  /* ---------- 画像プレースホルダー（data URI / 外部ファイル無し） ---------- */
+  function placeholderImg(label, bg) {
+    var svg =
+      '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="230">' +
+      '<rect width="100%" height="100%" fill="' + bg + '"/>' +
+      '<text x="50%" y="52%" font-size="22" font-family="sans-serif" fill="#ffffff" ' +
+      'text-anchor="middle" dominant-baseline="middle">' + label + '</text>' +
+      '</svg>';
+    return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+  }
+
+  function yen(n) {
+    return "¥" + n.toLocaleString("ja-JP");
+  }
+
+  function Stars(rating) {
+    var full = Math.round(rating);
+    var s = "";
+    for (var i = 0; i < 5; i++) s += i < full ? "★" : "☆";
+    return s;
+  }
+
+  /* ---------- デモ透かし（操作の邪魔をしない） ---------- */
+  function DemoWatermark() {
+    return h(
+      "div",
+      {
+        style: {
+          position: "fixed",
+          top: "8px",
+          left: "8px",
+          zIndex: 99999,
+          pointerEvents: "none",
+          background: "rgba(0,0,0,0.32)",
+          color: "#fff",
+          fontSize: "10px",
+          padding: "3px 9px",
+          borderRadius: "999px",
+          fontFamily: "sans-serif",
+          letterSpacing: "0.02em"
+        }
+      },
+      CONFIG.demoLabelText
+    );
+  }
+
+  /* ---------- 疑似ブラウザ枠（URLバー） ---------- */
+  function BrowserChrome(props) {
+    var canBack = props.canBack;
+    return h(
+      "div",
+      { style: { background: "#dee1e6", borderRadius: "10px 10px 0 0", padding: "8px 10px", display: "flex", alignItems: "center", gap: "8px" } },
+      h("div", { style: { display: "flex", gap: "6px", marginRight: "4px" } },
+        h("span", { style: dotStyle("#ff5f57") }),
+        h("span", { style: dotStyle("#febc2e") }),
+        h("span", { style: dotStyle("#28c840") })
+      ),
+      h(
+        "button",
+        {
+          onClick: props.onBack,
+          disabled: !canBack,
+          style: {
+            border: "none",
+            background: "transparent",
+            fontSize: "14px",
+            cursor: canBack ? "pointer" : "default",
+            opacity: canBack ? 1 : 0.3,
+            padding: "2px 6px"
+          }
+        },
+        "←"
+      ),
+      h(
+        "div",
+        {
+          style: {
+            flex: 1,
+            background: "#fff",
+            borderRadius: "999px",
+            padding: "5px 14px",
+            fontSize: "12px",
+            color: "#333",
+            fontFamily: "monospace",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap"
+          }
+        },
+        props.url
+      )
+    );
+  }
+  function dotStyle(c) {
+    return { width: "10px", height: "10px", borderRadius: "50%", background: c, display: "inline-block" };
+  }
+
+  /* ---------- サイトヘッダー ---------- */
+  function SiteHeader(props) {
+    var keyword = props.keyword,
+      onKeywordChange = props.onKeywordChange,
+      onSearch = props.onSearch,
+      onLogoClick = props.onLogoClick;
+    var inputRef = useRef(null);
+
+    return h(
+      "div",
+      { style: { background: CONFIG.headerBg, borderBottom: "1px solid #e3e3e3" } },
+      h(
+        "div",
+        { style: { display: "flex", alignItems: "center", gap: "16px", padding: "12px 20px" } },
+        h(
+          "div",
+          { onClick: onLogoClick, style: { cursor: "pointer", whiteSpace: "nowrap", display: "flex", alignItems: "center" } },
+          CONFIG.logoImage
+            ? h("img", { src: CONFIG.logoImage, alt: CONFIG.siteName, style: { height: "28px" } })
+            : h("span", { style: { fontSize: "20px", fontWeight: "bold", color: CONFIG.siteAccent } }, CONFIG.siteName)
+        ),
+        h(
+          "div",
+          { style: { flex: 1, display: "flex", maxWidth: "520px" } },
+          h("input", {
+            ref: inputRef,
+            defaultValue: keyword,
+            placeholder: CONFIG.searchPlaceholder,
+            onKeyDown: function (e) {
+              if (e.key === "Enter") onSearch(e.target.value);
+            },
+            style: {
+              flex: 1,
+              border: "1px solid #ccc",
+              borderRight: "none",
+              borderRadius: "4px 0 0 4px",
+              padding: "8px 12px",
+              fontSize: "14px",
+              outline: "none"
+            }
+          }),
+          h(
+            "button",
+            {
+              onClick: function () {
+                onSearch(inputRef.current.value);
+              },
+              style: {
+                border: "none",
+                background: CONFIG.headerSearchBtnColor,
+                color: "#fff",
+                padding: "0 18px",
+                borderRadius: "0 4px 4px 0",
+                cursor: "pointer",
+                fontSize: "14px"
+              }
+            },
+            "検索"
+          )
+        ),
+        h(
+          "div",
+          { style: { marginLeft: "auto", fontSize: "12px", color: "#555", display: "flex", gap: "16px" } },
+          CONFIG.headerLinks.map(function (t, i) {
+            return h("span", { key: i }, t);
+          })
+        )
+      ),
+      h(
+        "div",
+        { style: { display: "flex", gap: "20px", padding: "0 20px 12px 20px", fontSize: "13px", color: "#000", fontWeight: "bold" } },
+        CONFIG.navItems.map(function (t, i) {
+          return h("span", { key: i }, t);
+        })
+      )
+    );
+  }
+
+  /* ---------- 商品カード ---------- */
+  function ProductCard(props) {
+    var p = props.product,
+      isPR = props.isPR,
+      onClick = props.onClick;
+    return h(
+      "div",
+      {
+        onClick: function () {
+          onClick(p);
+        },
+        style: {
+          border: isPR ? "2px solid " + CONFIG.prColor : "1px solid #e0e0e0",
+          borderRadius: "6px",
+          overflow: "hidden",
+          background: "#fff",
+          cursor: "pointer",
+          display: "flex",
+          flexDirection: "column",
+          transition: "box-shadow .15s",
+          boxShadow: "0 1px 2px rgba(0,0,0,0.04)"
+        }
+      },
+      h(
+        "div",
+        { style: { position: "relative" } },
+        h("img", { src: p.image || placeholderImg(p.badge || p.name.slice(0, 6), p.color || "#999"), style: { width: "100%", height: "130px", objectFit: "cover", display: "block" } }),
+        p.badge
+          ? h(
+              "span",
+              {
+                style: {
+                  position: "absolute",
+                  top: "6px",
+                  left: "6px",
+                  background: "#d92027",
+                  color: "#fff",
+                  fontSize: "10px",
+                  fontWeight: "bold",
+                  padding: "2px 7px",
+                  borderRadius: "3px",
+                  boxShadow: "0 1px 2px rgba(0,0,0,0.25)"
+                }
+              },
+              p.badge
+            )
+          : null
+      ),
+      h(
+        "div",
+        { style: { padding: "10px", display: "flex", flexDirection: "column", gap: "4px", flex: 1 } },
+        isPR
+          ? h(
+              "span",
+              {
+                style: {
+                  alignSelf: "flex-start",
+                  border: "1px solid " + CONFIG.prColor,
+                  color: CONFIG.prColor,
+                  fontSize: "10px",
+                  padding: "1px 6px",
+                  borderRadius: "3px",
+                  fontWeight: "bold"
+                }
+              },
+              "PR"
+            )
+          : null,
+        h("div", { style: { fontSize: "12.5px", lineHeight: 1.4, height: "3.9em", overflow: "hidden" } }, p.name),
+        h("div", { style: { fontSize: "11px", color: "#888" } }, p.place),
+        h("div", { style: { fontSize: "11px", color: "#e2a71b" } }, Stars(p.rating) + " (" + p.reviews + ")"),
+        h("div", { style: { marginTop: "auto", fontSize: "15px", color: CONFIG.ctaColor, fontWeight: "bold" } }, yen(p.price))
+      )
+    );
+  }
+
+  /* ---------- TOPページ ---------- */
+  function TopPage(props) {
+    var onSearch = props.onSearch,
+      onOpenProduct = props.onOpenProduct;
+    var ranking = CONFIG.organicProducts.slice(0, 8);
+
+    return h(
+      "div",
+      { style: { padding: "18px 20px 60px" } },
+      h(
+        "div",
+        { style: { display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "18px" } },
+        CONFIG.quickKeywords.map(function (k, i) {
+          return h(
+            "button",
+            {
+              key: i,
+              onClick: function () {
+                onSearch(k);
+              },
+              style: {
+                border: "1px solid #ccc",
+                background: "#fff",
+                borderRadius: "999px",
+                padding: "6px 14px",
+                fontSize: "13px",
+                cursor: "pointer"
+              }
+            },
+            k
+          );
+        })
+      ),
+      h("h3", { style: sectionTitleStyle() }, "ピックアップ商品 ", h("span", { style: { color: CONFIG.prColor, fontSize: "12px" } }, "[PR]"), " ", h("span", { style: moreStyle() }, "もっと見る"))
+      ,
+      h(
+        "div",
+        { style: { border: "2px solid " + CONFIG.prColor, borderRadius: "6px", padding: "10px", marginBottom: "24px", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px" } },
+        CONFIG.searchAdProducts.map(function (p) {
+          return h(ProductCard, { key: "pickup-" + p.id, product: p, isPR: true, onClick: onOpenProduct });
+        })
+      ),
+      h("h3", { style: sectionTitleStyle() }, CONFIG.rankingTitle + " ", h("span", { style: moreStyle() }, "もっと見る")),
+      h(
+        "div",
+        { style: gridStyle() },
+        ranking.map(function (p) {
+          return h(ProductCard, { key: p.id, product: p, isPR: false, onClick: onOpenProduct });
+        })
+      )
+    );
+  }
+  function sectionTitleStyle() {
+    return { fontSize: "14px", color: "#333", borderLeft: "4px solid " + CONFIG.siteAccent, paddingLeft: "8px", marginBottom: "10px" };
+  }
+  function moreStyle() {
+    return { float: "right", fontSize: "11px", color: "#888", fontWeight: "normal" };
+  }
+  function gridStyle() {
+    return { display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "12px" };
+  }
+
+  /* ---------- 検索結果ページ ---------- */
+  function SearchPage(props) {
+    var keyword = props.keyword,
+      onOpenProduct = props.onOpenProduct;
+    var ads = CONFIG.searchAdProducts;
+    var results = CONFIG.organicProducts.filter(function (p) {
+      if (!keyword) return true;
+      var k = keyword.trim();
+      if (!k) return true;
+      return p.name.indexOf(k) !== -1;
+    });
+    if (results.length === 0) results = CONFIG.organicProducts.slice(0, 4);
+
+    return h(
+      "div",
+      { style: { display: "flex", padding: "16px 20px 60px", gap: "20px" } },
+      h(
+        "div",
+        { style: { width: "160px", flexShrink: 0, fontSize: "12px", color: "#555" } },
+        h("div", { style: { fontWeight: "bold", marginBottom: "8px" } }, "価格帯"),
+        h("div", null, "¥ 〜 ¥"),
+        h("div", { style: { fontWeight: "bold", margin: "14px 0 8px" } }, "特典"),
+        ["定期便", "ギフト対応", "のし対応", "在庫切れを含む"].map(function (t, i) {
+          return h("div", { key: i, style: { marginBottom: "4px" } }, h("input", { type: "checkbox", disabled: true }), " " + t);
+        }),
+        h("div", { style: { fontWeight: "bold", margin: "14px 0 8px" } }, "配送方法"),
+        h("div", null, h("input", { type: "checkbox", disabled: true }), " 常温配送")
+      ),
+      h(
+        "div",
+        { style: { flex: 1 } },
+        h("div", { style: { fontSize: "13px", color: "#666", marginBottom: "10px" } }, "「" + (keyword || "すべて") + "」の検索結果　全" + (results.length * 1000 + 184356) + "件"),
+        h(
+          "div",
+          {
+            style: {
+              border: "2px solid " + CONFIG.prColor,
+              borderRadius: "6px",
+              padding: "10px",
+              marginBottom: "16px",
+              display: "grid",
+              gridTemplateColumns: "repeat(4, 1fr)",
+              gap: "12px"
+            }
+          },
+          ads.map(function (p) {
+            return h(ProductCard, { key: "ad-" + p.id, product: p, isPR: true, onClick: onOpenProduct });
+          })
+        ),
+        h("div", { style: gridStyle() },
+          results.map(function (p) {
+            return h(ProductCard, { key: p.id, product: p, isPR: false, onClick: onOpenProduct });
+          })
+        )
+      )
+    );
+  }
+
+  /* ---------- 商品詳細ページ ---------- */
+  function DetailPage(props) {
+    var product = props.product,
+      onOpenProduct = props.onOpenProduct;
+    var recRef = useRef(null);
+    var _v = useState(false),
+      visible = _v[0],
+      setVisible = _v[1];
+
+    useEffect(function () {
+      if (!recRef.current) return;
+      var obs = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (e) {
+            if (e.isIntersecting) setVisible(true);
+          });
+        },
+        { threshold: 0.15 }
+      );
+      obs.observe(recRef.current);
+      return function () {
+        obs.disconnect();
+      };
+    }, []);
+
+    return h(
+      "div",
+      { style: { padding: "20px 20px 80px", maxWidth: "900px", margin: "0 auto" } },
+      h("div", { style: { fontSize: "12px", color: "#999", marginBottom: "12px" } }, "TOP > 検索結果 > " + product.name),
+      h(
+        "div",
+        { style: { display: "flex", gap: "24px", flexWrap: "wrap" } },
+        h("img", { src: product.image || placeholderImg(product.badge || product.name.slice(0, 6), product.color || "#999"), style: { width: "320px", height: "230px", borderRadius: "6px", objectFit: "cover" } }),
+        h(
+          "div",
+          { style: { flex: 1, minWidth: "260px" } },
+          h("h2", { style: { fontSize: "19px", margin: "0 0 8px" } }, product.name),
+          h("div", { style: { fontSize: "13px", color: "#666", marginBottom: "6px" } }, product.place),
+          h("div", { style: { fontSize: "13px", color: "#e2a71b", marginBottom: "10px" } }, Stars(product.rating) + " (" + product.reviews + "件)"),
+          h("div", { style: { fontSize: "26px", color: CONFIG.ctaColor, fontWeight: "bold", marginBottom: "16px" } }, yen(product.price)),
+          h(
+            "button",
+            {
+              style: {
+                background: CONFIG.ctaColor,
+                color: "#fff",
+                border: "none",
+                padding: "12px 32px",
+                borderRadius: "4px",
+                fontSize: "15px",
+                cursor: "pointer"
+              }
+            },
+            "寄付を申し込む"
+          )
+        )
+      ),
+      h(
+        "div",
+        { style: { marginTop: "36px", fontSize: "14px", lineHeight: 1.8, color: "#333" } },
+        h("h3", { style: sectionTitleStyle() }, "商品説明"),
+        h(
+          "p",
+          null,
+          "厳選した素材を丁寧に加工し、ご家庭で手軽に本格的な味わいをお楽しみいただけます。冷凍でお届けするため、長期保存が可能で、贈答用としても人気の一品です。解凍後はそのまま焼くだけで、専門店のような仕上がりになります。"
+        ),
+        h(
+          "p",
+          null,
+          "生産者のこだわりが詰まった逸品を、ぜひご自宅でご堪能ください。数量限定のためお申し込みはお早めにどうぞ。"
+        )
+      ),
+      h(
+        "div",
+        { ref: recRef, style: { marginTop: "40px", opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(12px)", transition: "opacity .4s, transform .4s" } },
+        h("h3", { style: sectionTitleStyle() }, "あなたへのおすすめ"),
+        h(
+          "div",
+          { style: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "16px", maxWidth: "520px" } },
+          CONFIG.recommendAdProducts.map(function (p) {
+            return h(ProductCard, { key: p.id, product: p, isPR: true, onClick: onOpenProduct });
+          })
+        )
+      )
+    );
+  }
+
+  /* ---------- App（ルーティング管理） ---------- */
+  function App() {
+    var _s = useState({ view: "top", keyword: "" });
+    var state = _s[0],
+      setState = _s[1];
+    var _h = useState([]);
+    var history = _h[0],
+      setHistory = _h[1];
+
+    function push(next) {
+      setHistory(function (hs) {
+        return hs.concat([state]);
+      });
+      setState(next);
+    }
+    function goBack() {
+      if (history.length === 0) return;
+      var prev = history[history.length - 1];
+      setHistory(history.slice(0, -1));
+      setState(prev);
+    }
+
+    function doSearch(keyword) {
+      push({ view: "search", keyword: keyword || "" });
+    }
+    function openProduct(product) {
+      push({ view: "detail", keyword: state.keyword, product: product });
+    }
+    function goTop() {
+      push({ view: "top", keyword: "" });
+    }
+
+    var url =
+      state.view === "top"
+        ? "https://" + CONFIG.siteUrl + "/"
+        : state.view === "search"
+        ? "https://" + CONFIG.siteUrl + "/search?keyword=" + encodeURIComponent(state.keyword || "")
+        : "https://" + CONFIG.siteUrl + "/product_detail.aspx?pid=" + state.product.id;
+
+    return h(
+      React.Fragment,
+      null,
+      h(DemoWatermark),
+      h(
+        "div",
+        { style: { maxWidth: "1180px", margin: "24px auto", background: CONFIG.bgColor, borderRadius: "10px", overflow: "hidden", boxShadow: "0 4px 24px rgba(0,0,0,0.12)" } },
+        h(BrowserChrome, { url: url, canBack: history.length > 0, onBack: goBack }),
+        h(SiteHeader, { keyword: state.keyword, onSearch: doSearch, onLogoClick: goTop }),
+        state.view === "top" ? h(TopPage, { onSearch: doSearch, onOpenProduct: openProduct }) : null,
+        state.view === "search" ? h(SearchPage, { keyword: state.keyword, onOpenProduct: openProduct }) : null,
+        state.view === "detail" ? h(DetailPage, { product: state.product, onOpenProduct: openProduct }) : null,
+        h(
+          "div",
+          { style: { background: "#1a2b4c", color: "#fff", fontSize: "11.5px", padding: "10px 20px", lineHeight: 1.6 } },
+          "赤枠・「PR」表記の枠が、S4Ads導入によって追加される広告掲載イメージです（検索結果の最上部＝検索広告 / 商品詳細ページ下部＝レコメンド広告）。"
+        )
+      )
+    );
+  }
+
+  var root = ReactDOM.createRoot(document.getElementById("root"));
+  root.render(h(App));
+})();
+</script>
+</body>
+</html>
