@@ -375,7 +375,7 @@ function buildConfig() {
 
 function renderMockHtml(config) {
   var marker = /\/\*__CONFIG_JSON__\*\/[\s\S]*?;\/\*__CONFIG_JSON_END__\*\//;
-  // </script> や <!-- がJSON文字列内に混入していても、埋め込み先の<script>タグが
+  // スクリプト終了タグや coment記号がJSON文字列内に混入していても、埋め込み先が
   // 途中で閉じてしまわないようにエスケープする（スクレイピングした商品名は信頼できないデータのため）
   var safeJson = JSON.stringify(config).replace(/</g, "\\u003c").replace(/>/g, "\\u003e");
   var replacement = "/*__CONFIG_JSON__*/" + safeJson + ";/*__CONFIG_JSON_END__*/";
