@@ -134,7 +134,13 @@ function rgbToHex(rgb) {
 /* ---------- 抽出ロジック（対象ページのコンテキストで実行される） ---------- */
 function extractFromPage(TARGET_URL) {
   function isNoiseText(t) {
-    return /%|オフ|OFF\b|セール|SALE\b|クーポン|coupon|チェックした|閲覧履歴|最近見た|お気に入り|カートに入れる|もっと見る|続きを見る|レビュー|口コミ|送料|ポイント還元|会員限定|期間限定|在庫|ランキング|^(PR|AD)$|★|☆|\bNEW\b/i.test(t);
+    return /%|オフ|OFF\b|セール|SALE\b|クーポン|coupon|チェックした|閲覧履歴|最近見た|お気に入り|カートに入れる|もっと見る|続きを見る|レビュー|口コミ|送料|ポイント還元|会員限定|期間限定|在庫|ランキング|^(PR|AD)$|★|☆|\bNEW\b|ログイン|ログアウト|会員登録|新規登録|サインイン|サインアップ|アカウント|パスワード|マイページ/i.test(t);
+  }
+  function isAuthOrNavLink(el) {
+    var a = el.closest ? el.closest("a") : null;
+    if (!a) return false;
+    var href = (a.getAttribute("href") || "").toLowerCase();
+    return /login|signin|sign-in|regist|member|account|mypage|logout|cart|favorite/.test(href);
   }
   function rgbToHex(rgb) {
     var m = rgb.match(/\d+/g);
@@ -192,7 +198,11 @@ function extractFromPage(TARGET_URL) {
   }
   function findProducts() {
     var imgs = Array.prototype.slice.call(document.images).filter(function (img) {
-      return img.naturalWidth >= 80 && img.naturalWidth <= 900 && img.naturalHeight >= 80;
+      if (img.naturalWidth < 80 || img.naturalWidth > 900 || img.naturalHeight < 80) return false;
+      var r = img.getBoundingClientRect();
+      if (r.top < 180) return false; // ヘッダー/ナビ領域（ログイン・会員登録アイコン等）を除外
+      if (isAuthOrNavLink(img)) return false; // login/account系リンク配下の画像を除外
+      return true;
     });
     var buckets = {};
     imgs.forEach(function (img) {
@@ -239,12 +249,14 @@ function extractFromPage(TARGET_URL) {
         candidates.sort(function (a, b) { return b.length - a.length; });
         name = candidates[0] || "";
       }
+      if (!name) return; // 商品名を特定できなかった候補は結果に含めない
       products.push({ name: name.slice(0, 80), price: price, place: null, rating: 4.5, reviews: reviews, image: img.src });
     });
     return products.slice(0, 20);
   }
 
   try {
+    window.scrollTo(0, 0); // ヘッダー領域の座標判定（ロゴ・ナビ・商品除外）を安定させるため先頭に戻す
     var qs = new URLSearchParams(location.search);
     var data = {
       siteName: (document.querySelector('meta[property="og:site_name"]') || {}).content || document.title.split(/[|｜\-–—]/)[0].trim(),
