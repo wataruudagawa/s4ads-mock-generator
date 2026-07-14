@@ -160,7 +160,7 @@ function extractFromPage(TARGET_URL) {
       var bs = /logo/i.test(b.src + b.alt + b.className) ? 0 : 1;
       return as - bs;
     });
-    return candidates.length ? candidates[0].src : null;
+    return candidates.length ? realImgSrc(candidates[0]) : null;
   }
   function findSearchBtnColor() {
     var inputs = Array.prototype.slice.call(document.querySelectorAll('input[type="text"],input[type="search"],input:not([type])'));
@@ -196,6 +196,18 @@ function extractFromPage(TARGET_URL) {
     items.forEach(function (t) { if (uniq.indexOf(t) === -1) uniq.push(t); });
     return uniq.slice(0, 6);
   }
+  function realImgSrc(img) {
+    // 遅延読み込み（lazy load）サイトでは img.src がローディング用プレースホルダーのままの
+    // ことが多く、実画像URLは data-src 等の属性に入っている場合が多いためそちらを優先する
+    var lazyAttrs = ["data-src", "data-original", "data-lazy-src", "data-lazy", "data-echo", "data-srcset"];
+    var raw = null;
+    for (var i = 0; i < lazyAttrs.length; i++) {
+      var v = img.getAttribute(lazyAttrs[i]);
+      if (v) { raw = v.split(" ")[0]; break; }
+    }
+    if (!raw) raw = img.currentSrc || img.src;
+    try { return new URL(raw, location.href).href; } catch (e) { return raw; }
+  }
   function findProducts() {
     var imgs = Array.prototype.slice.call(document.images).filter(function (img) {
       if (img.naturalWidth < 80 || img.naturalWidth > 900 || img.naturalHeight < 80) return false;
@@ -217,8 +229,9 @@ function extractFromPage(TARGET_URL) {
     var seen = {};
     var products = [];
     best.forEach(function (img) {
-      if (seen[img.src]) return;
-      seen[img.src] = true;
+      var realSrc = realImgSrc(img);
+      if (seen[realSrc]) return;
+      seen[realSrc] = true;
       var scope = img.closest("li") || img.closest("a");
       if (!scope) {
         scope = img;
@@ -250,7 +263,7 @@ function extractFromPage(TARGET_URL) {
         name = candidates[0] || "";
       }
       if (!name) return; // 商品名を特定できなかった候補は結果に含めない
-      products.push({ name: name.slice(0, 80), price: price, place: null, rating: 4.5, reviews: reviews, image: img.src });
+      products.push({ name: name.slice(0, 80), price: price, place: null, rating: 4.5, reviews: reviews, image: realSrc });
     });
     return products.slice(0, 20);
   }
