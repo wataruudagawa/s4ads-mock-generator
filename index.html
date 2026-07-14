@@ -91,6 +91,8 @@
       <input type="text" id="navItems">
       <label>クイック検索キーワード（カンマ区切り）</label>
       <input type="text" id="quickKeywords">
+      <label>商品詳細ページのCTAボタン文言</label>
+      <input type="text" id="ctaButtonText" placeholder="例：カートに入れる／応募する／お問い合わせする" value="カートに入れる">
     </div>
 
     <div class="step">
@@ -131,6 +133,9 @@ function rgbToHex(rgb) {
 
 /* ---------- 抽出ロジック（対象ページのコンテキストで実行される） ---------- */
 function extractFromPage(TARGET_URL) {
+  function isNoiseText(t) {
+    return /%|オフ|OFF\b|セール|SALE\b|クーポン|coupon|チェックした|閲覧履歴|最近見た|お気に入り|カートに入れる|もっと見る|続きを見る|レビュー|口コミ|送料|ポイント還元|会員限定|期間限定|在庫|ランキング|^(PR|AD)$|★|☆|\bNEW\b/i.test(t);
+  }
   function rgbToHex(rgb) {
     var m = rgb.match(/\d+/g);
     if (!m) return null;
@@ -218,9 +223,21 @@ function extractFromPage(TARGET_URL) {
       var reviewMatch = text.match(/\(([0-9]+)\)/);
       var reviews = reviewMatch ? parseInt(reviewMatch[1], 10) : null;
       var name = (img.alt || "").trim();
+      if (name && isNoiseText(name)) name = "";
+      if (!name) {
+        var heading = scope.querySelector("h1,h2,h3,h4,h5,h6");
+        if (heading) {
+          var ht = heading.textContent.trim();
+          if (ht.length > 3 && !isNoiseText(ht)) name = ht;
+        }
+      }
       if (!name) {
         var lines = text.split("\n").map(function (s) { return s.trim(); }).filter(Boolean);
-        name = lines.filter(function (l) { return l.length > 4 && l.length < 60 && !/^[0-9,¥円()\s]+$/.test(l); })[0] || "";
+        var candidates = lines.filter(function (l) {
+          return l.length > 4 && l.length < 80 && !/^[0-9,¥円()\s]+$/.test(l) && !isNoiseText(l);
+        });
+        candidates.sort(function (a, b) { return b.length - a.length; });
+        name = candidates[0] || "";
       }
       products.push({ name: name.slice(0, 80), price: price, place: null, rating: 4.5, reviews: reviews, image: img.src });
     });
@@ -262,6 +279,7 @@ function applyData(data) {
   if (data.headerSearchBtnColor) document.getElementById("headerSearchBtnColor").value = data.headerSearchBtnColor;
   if (data.navItems && data.navItems.length) document.getElementById("navItems").value = data.navItems.join(", ");
   if (data.quickKeywords && data.quickKeywords.length) document.getElementById("quickKeywords").value = data.quickKeywords.join(", ");
+  if (data.ctaButtonText) document.getElementById("ctaButtonText").value = data.ctaButtonText;
   if (data.products && data.products.length) {
     state.products = data.products.map(function (p, i) {
       return { id: "p" + i, name: p.name || "", price: p.price || 0, place: p.place || "", rating: p.rating || 4.5, reviews: p.reviews || 0, image: p.image || "", badge: p.badge || "" };
@@ -367,6 +385,7 @@ function buildConfig() {
     headerLinks: ["よくあるご質問", "ログイン", "お気に入り", "カート"],
     quickKeywords: quickKeywords.length ? quickKeywords : ["キーワード"],
     rankingTitle: "人気商品ランキング",
+    ctaButtonText: document.getElementById("ctaButtonText").value || "カートに入れる",
     searchAdProducts: clean(ads.length ? ads : state.products.slice(0, 4)),
     recommendAdProducts: clean(recs.length ? recs : state.products.slice(0, 2)),
     organicProducts: clean(organic)

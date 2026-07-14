@@ -31,6 +31,7 @@ window.MOCKUP_CONFIG = /*__CONFIG_JSON__*/{
   headerLinks: ["よくあるご質問", "ログイン", "お気に入り", "カート"],
   quickKeywords: ["お肉"],
   rankingTitle: "人気商品ランキング",
+  ctaButtonText: "カートに入れる",
   searchAdProducts: [
     { id: "698252", name: "佐賀牛 A5ランク サイコロステーキ800g", place: "佐賀県大町町", price: 21000, rating: 4.8, reviews: 15, badge: "A5ランク", image: "https://cf.furunavi.jp/Api/ProductImages/v1?ProductId=698252&Type=1" },
     { id: "464732", name: "数量限定 厳選 宮崎牛 赤身 焼肉 計800g", place: "宮崎県日南市", price: 14500, rating: 4.6, reviews: 2108, badge: "数量限定", image: "https://cf.furunavi.jp/Api/ProductImages/v1?ProductId=464732&Type=1" },
@@ -491,7 +492,7 @@ window.MOCKUP_CONFIG = /*__CONFIG_JSON__*/{
                 cursor: "pointer"
               }
             },
-            "寄付を申し込む"
+            CONFIG.ctaButtonText || "カートに入れる"
           )
         )
       ),
