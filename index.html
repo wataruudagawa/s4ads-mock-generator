@@ -292,8 +292,11 @@ function extractFromPage(TARGET_URL) {
 
 function buildBookmarklet() {
   var targetUrl = location.href.split("#")[0];
-  var src = "javascript:(" + extractFromPage.toString() + ")(" + JSON.stringify(targetUrl) + ")";
-  document.getElementById("bookmarkletLink").setAttribute("href", src);
+  // 生の改行を含んだまま href に入れると、ブックマーク保存時に改行が失われ
+  // コード中の `// コメント` が後続の全コードを巻き込んでしまうため、必ずURIエンコードする
+  var rawSrc = "(" + extractFromPage.toString() + ")(" + JSON.stringify(targetUrl) + ")";
+  var href = "javascript:" + encodeURIComponent(rawSrc);
+  document.getElementById("bookmarkletLink").setAttribute("href", href);
 }
 
 /* ---------- ページ側：フォーム状態 <-> UI ---------- */
